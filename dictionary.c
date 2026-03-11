@@ -1,6 +1,8 @@
 // Implements a dictionary's functionality
 #include <stdio.h>
 #include <string.h>
+#include <strings.h>
+
 #include <stdlib.h>
 
 #include <ctype.h>
@@ -21,10 +23,34 @@ const unsigned int N = 10000;
 // Hash table
 node *table[N];
 
+// Words count
+int wordCount = 0;
+
 // Returns true if word is in dictionary, else false
 bool check(const char *word)
 {
     // TODO
+    int bucket = hash(word);
+
+    node *headPtr = table[bucket];
+
+    if (headPtr == NULL)
+    {
+        return false;
+    }
+
+    while (headPtr != NULL)
+    {
+        if (strcasecmp(word, headPtr->word) == 0)
+        {
+            return true;
+        }
+
+        else
+        {
+            headPtr = headPtr->next;
+        }
+    }
     return false;
 }
 
@@ -44,18 +70,18 @@ unsigned int hash(const char *word)
     return hashValue % N;
 }
 
-void insertHash(int num, node *n)
+void insertHash(int bucket, node *n)
 {
-    // If ptr table[num] points as nothing, insert new node and point at it
-    if (table[num] == NULL)
+    // If ptr table[bucket] points as nothing, insert new node and point at it
+    if (table[bucket] == NULL)
     {
-        table[num] = n;
+        table[bucket] = n;
     }
-    // Else make new node pointing at chain and link ptr head (table[num]) to it
+    // Else make new node pointing at chain and link ptr head (table[bucket]) to it
     else
     {
-        n->next = table[num];
-        table[num] = n;
+        n->next = table[bucket];
+        table[bucket] = n;
     }
 }
 
@@ -70,13 +96,16 @@ bool load(const char *dictionary)
 
     // Scan and hash each word
     char word[LENGTH + 1];
+
     while (fscanf(file, "%s", word) != EOF)
     {
-        int num = hash(word);
+        int hashValue = hash(word);
         // Allocate new memory for node, copy word in it and add it to the hash table
         node *n = malloc(sizeof(node));
         strcpy(n->word, word);
-        insertHash(num, n);
+        insertHash(hashValue, n);
+        wordCount++;
+        size();
     }
     fclose(file);
 
@@ -87,6 +116,10 @@ bool load(const char *dictionary)
 unsigned int size(void)
 {
     // TODO
+    if (wordCount != 0)
+    {
+        return wordCount;
+    }
     return 0;
 }
 
@@ -94,5 +127,16 @@ unsigned int size(void)
 bool unload(void)
 {
     // TODO
-    return false;
+    for (int i = N; i < N; i--)
+    {
+        node *headPtr = table[i];
+
+        while (headPtr != NULL)
+        {
+            table[i] = headPtr->next;
+            free(headPtr);
+        }
+        free(headPtr);
+    }
+    return true;
 }
