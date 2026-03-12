@@ -32,12 +32,8 @@ bool check(const char *word)
     // TODO
     int bucket = hash(word);
 
-    node *headPtr = table[bucket];
-
-    if (headPtr == NULL)
-    {
-        return false;
-    }
+    node *headPtr = NULL;
+    headPtr = table[bucket];
 
     while (headPtr != NULL)
     {
@@ -116,27 +112,24 @@ bool load(const char *dictionary)
 unsigned int size(void)
 {
     // TODO
-    if (wordCount != 0)
-    {
-        return wordCount;
-    }
-    return 0;
+    return wordCount;
 }
 
 // Unloads dictionary from memory, returning true if successful, else false
 bool unload(void)
 {
     // TODO
-    for (int i = N; i < N; i--)
+    for (int i = 0; i < N; i++)
     {
-        node *headPtr = table[i];
+        node *headPtr = malloc(sizeof(node));
+        headPtr = table[i];
 
         while (headPtr != NULL)
         {
-            table[i] = headPtr->next;
+            node *nextPointer = headPtr->next;
             free(headPtr);
+            headPtr = nextPointer;
         }
-        free(headPtr);
     }
     return true;
 }
