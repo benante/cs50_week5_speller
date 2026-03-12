@@ -72,6 +72,7 @@ void insertHash(int bucket, node *n)
     if (table[bucket] == NULL)
     {
         table[bucket] = n;
+        n->next = NULL;
     }
     // Else make new node pointing at chain and link ptr head (table[bucket]) to it
     else
@@ -121,8 +122,7 @@ bool unload(void)
     // TODO
     for (int i = 0; i < N; i++)
     {
-        node *headPtr = malloc(sizeof(node));
-        headPtr = table[i];
+        node *headPtr = table[i];
 
         while (headPtr != NULL)
         {
