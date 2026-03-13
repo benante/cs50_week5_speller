@@ -2,9 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <strings.h>
-
 #include <stdlib.h>
-
 #include <ctype.h>
 #include <stdbool.h>
 
@@ -30,22 +28,21 @@ int wordCount = 0;
 bool check(const char *word)
 {
     // TODO
+    // Hash the word to get correct bucket to look into
+    // Initialize headPointer pointer and set it to what table[bucket] points to
     int bucket = hash(word);
-
     node *headPtr = NULL;
     headPtr = table[bucket];
 
+    // Loop through linked list, comparing word to linked list element->word
+    // Return true if found, else set pointer to next l.l.element
     while (headPtr != NULL)
     {
         if (strcasecmp(word, headPtr->word) == 0)
-        {
             return true;
-        }
 
         else
-        {
             headPtr = headPtr->next;
-        }
     }
     return false;
 }
@@ -72,6 +69,7 @@ void insertHash(int bucket, node *n)
     if (table[bucket] == NULL)
     {
         table[bucket] = n;
+        // IMPORTANT: you must set n->next to NULL, otherwise it will contain garbage values and valgrind will show an error
         n->next = NULL;
     }
     // Else make new node pointing at chain and link ptr head (table[bucket]) to it
@@ -93,7 +91,6 @@ bool load(const char *dictionary)
 
     // Scan and hash each word
     char word[LENGTH + 1];
-
     while (fscanf(file, "%s", word) != EOF)
     {
         int hashValue = hash(word);
@@ -120,12 +117,15 @@ unsigned int size(void)
 bool unload(void)
 {
     // TODO
+    // Loop through the hash table
     for (int i = 0; i < N; i++)
     {
+        // Set headPointer pointer to beginning of hash table
         node *headPtr = table[i];
 
         while (headPtr != NULL)
         {
+            // Set another pointer chained to next element, free current headPointer set it to what next pointer points to
             node *nextPointer = headPtr->next;
             free(headPtr);
             headPtr = nextPointer;
